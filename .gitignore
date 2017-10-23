@@ -1,0 +1,5 @@
+database/
+lets-encrypt/
+logs/
+mongo-db/
+nginx/certs/
