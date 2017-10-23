@@ -1,0 +1,89 @@
+# Special thanks to the two sites below for helping me get started
+# on the right path.
+#
+# https://opsnotice.xyz/lemp-on-docker/
+# https://reprage.com/post/SSL-with-letsencrypt-nginx-and-docker
+
+version: '3'
+
+services:
+  mariadb:
+    container_name: mariadb
+    image: mariadb:latest
+    # This exposes port 3306 on the local docker network,
+    # but not to the public internet. This allows you to
+    # ssh tunnel in to your mariadb server
+    ports:
+        - "127.0.0.1:3306:3306"
+    volumes:
+        - ${DB_FILES_PATH}:/var/lib/mysql
+    environment:
+        - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+        - MYSQL_DATABASE=${DB_NAME}
+    restart: always
+
+  mongodb:
+    container_name: mongodb
+    image: mongo:latest
+    # Same trick here. Expose the port locally, but
+    # not to the wider world.
+    ports:
+        - '127.0.0.1:27017:27017'
+    volumes:
+        - ${MONGO_FILES_PATH}:/data/db
+    restart: always
+
+  fpm:
+    container_name: fpm
+    build: images/php7-fpm
+    volumes:
+        - ${SITE1_FILES_PATH}:/var/www/example.com
+        - ${SITE2_FILES_PATH}:/var/www/othersite.com
+    links:
+        - mariadb
+        - mongodb
+    restart: always
+
+  nginx:
+    container_name: nginx
+    image: nginx:latest
+    # Explicitly use IPv6. Without this, the request from
+    # Certbot will timeout because it executes the
+    # acme-challenge via IPv6
+    ports:
+        - "${PUBLIC_IP_V4}:80:80"
+        - "${PUBLIC_IP_V4}:443:443"
+        - "${PUBLIC_IP_V6}:80:80"
+        - "${PUBLIC_IP_V6}:443:443"
+    volumes:
+        - ${SITE1_FILES_PATH}:/var/www/example.com                  # location of php files for site 1
+        - ${SITE2_FILES_PATH}:/var/www/othersite.com                # location of php files for site 2
+        - ${NGINX_FILES_PATH}/nginx.conf:/etc/nginx/nginx.conf:ro   # config file
+        - ${NGINX_FILES_PATH}/certs:/etc/nginx/certs:ro             # location of dhparam file
+        - ${NGINX_FILES_PATH}/vhosts:/etc/nginx/vhosts              # virtual hosts
+        - ${LETS_ENCRYPT_DIR}:/etc/letsencrypt/                     # let's encrypt certs go here
+        - ${WELL_KNOWN_PATH}:/var/www/                              # location for acme challenges
+        - ./logs/nginx:/var/log/nginx:rw
+    links:
+        - fpm
+    restart: always
+
+  certbot:
+    container_name: certbot
+    build: images/certbot
+    volumes:
+        - ${WELL_KNOWN_PATH}:/www
+        - ${LETS_ENCRYPT_DIR}:/etc/letsencrypt
+    links:
+        - nginx
+    restart: always
+
+# Delete every Docker containers
+# Must be run first because images are attached to containers
+#docker rm -f $(docker ps -a -q)
+
+# Delete every Docker image
+#docker rmi -f $(docker images -q)
+
+# Initiate registration with let's encrypt
+# ./certbot-auto certonly --email kaizensoze42@gmail.com --webroot -w /www -d kaizen.pictures -d www.kaizen.pictures
