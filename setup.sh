@@ -1,1 +1,1 @@
-openssl dhparam -out dhparam.pem 4096
+openssl dhparam -out nginx/certs/dhparam.pem 4096

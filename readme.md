@@ -19,6 +19,8 @@ This repo also features MongoDB and Certbot.
 1. Modify `.env` to fit the particulars of your setup. Use absolute file paths.
 2. Modify `docker-compose.yml`; replacing `example.com` and `othersite.com` with your own URLs.
 3. Modify `nginx/vhosts/example.com` and replace occurences of `example.com` with your URLs.
+4. Create the following directories: `/database`, `/lets-encrypt`, `/logs`, `/mongo-db/`, and `nginx/certs/`
+5. Run `setup.sh`. It creates the `dhparam.key` file that your server will need to create valid SSL connections. The key generation is set to its highest setting, and it will take a fair amount of time to work its magic. Go get a coffee or something.
 
 **File locations**
 You can place your web sites in any directory on your server that you wish. If you chose a directory other than /sites/example.com, be sure to update the references in your .env file to point to the appropriate directory.
