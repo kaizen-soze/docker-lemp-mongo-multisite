@@ -52,4 +52,4 @@ Please replace the domains in the string above with your own values. Certbot wil
 3. Restart nginx: `sudo systemctl restart nginx`
 4. Attempt to access the secure version of your domain name.
 
-You can check the quality of your setup by verifying it at the (https://www.ssllabs.com/ssltest/)[SSL Labs] web site.
+You can check the quality of your setup by verifying it at the [SSL Labs](https://www.ssllabs.com/ssltest/) web site.
