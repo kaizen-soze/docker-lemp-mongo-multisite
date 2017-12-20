@@ -2,7 +2,7 @@ FROM php:7-fpm
 
 # Install modules
 RUN apt-get update && apt-get install -y \
-    libpng12-dev libjpeg-dev libssl-dev \
+    libpng-dev libjpeg-dev libssl-dev \
     && pecl install mongodb \
     && echo "extension=mongodb.so" >> /usr/local/etc/php/conf.d/mongodb.ini \
     && docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
