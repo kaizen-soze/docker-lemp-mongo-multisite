@@ -37,7 +37,7 @@ To view the logs for other services, type `sudo journalctl <service name>`
 ## Certbot
 Once the non-SSL version of your site appears, it's time to generate the SSL certificate with Let's Encrypt.
 
-Log into certbot with `docker exit -it certbot bash`
+Log into certbot with `docker exec -it certbot bash`
 
 Then, run:
 
@@ -49,7 +49,7 @@ Please replace the domains in the string above with your own values. Certbot wil
 
 1. Navigate to `vhosts.secure/example.com`
 2. Copy the second server block and paste it into your existing `vhosts/example.com` file. Replace all instances of example.com with your own domain name.
-3. Restart nginx: `sudo systemctl restart nginx`
+3. Restart nginx: `docker restart nginx`
 4. Attempt to access the secure version of your domain name.
 
 You can check the quality of your setup by verifying it at the [SSL Labs](https://www.ssllabs.com/ssltest/) web site.
